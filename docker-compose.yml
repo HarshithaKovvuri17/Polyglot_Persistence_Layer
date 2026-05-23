@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: logistics_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_secure_pass
+      POSTGRES_DB: logistics_billing
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d logistics_billing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:6.0
+    container_name: logistics_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo_user
+      MONGO_INITDB_ROOT_PASSWORD: mongo_secure_pass
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --eval 'db.runCommand(\"ping\")'"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  neo4j:
+    image: neo4j:5.12-community
+    container_name: logistics_neo4j
+    environment:
+      NEO4J_AUTH: neo4j/MyStrongPass123
+      # NEO4J_PLUGINS: '["apoc"]'   # disabled for simplicity
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p MyStrongPass123 \"RETURN 1\" || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+
+  app:
+    build: .
+    container_name: logistics_app
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - LOG_FILE_PATH=/app/events.log
+      - RETRY_QUEUE_PATH=/app/retry_queue.json
+      - RECONCILER_INTERVAL_MS=5000
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_secure_pass
+      - POSTGRES_DB=logistics_billing
+      - MONGO_URI=mongodb://mongo_user:mongo_secure_pass@mongo:27017/logistics_documents?authSource=admin
+      - MONGO_DB_NAME=logistics_documents
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=MyStrongPass123
+    volumes:
+      - ./events.log:/app/events.log
+      - ./retry_queue.json:/app/retry_queue.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  mongo_data:
+  neo4j_data:
