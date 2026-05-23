@@ -66,7 +66,10 @@ async function initDatabases() {
 
   // 3. Neo4j Initialization
   try {
-    neo4jDriver = neo4j.driver(neo4jUri, neo4j.auth.basic(neo4jUser, neo4jPassword));
+    neo4jDriver = neo4j.driver(neo4jUri, neo4j.auth.basic(neo4jUser, neo4jPassword), {
+      encryption: 'ENCRYPTION_OFF',
+      disableLosslessIntegers: true
+    });
     await neo4jDriver.verifyConnectivity();
     console.log('Connected to Neo4j successfully.');
 

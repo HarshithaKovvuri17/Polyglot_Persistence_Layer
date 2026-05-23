@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: logistics_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres_secure_pass
@@ -19,6 +20,7 @@ services:
   mongo:
     image: mongo:6.0
     container_name: logistics_mongo
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo_user
       MONGO_INITDB_ROOT_PASSWORD: mongo_secure_pass
@@ -35,12 +37,13 @@ services:
   neo4j:
     image: neo4j:5.12-community
     container_name: logistics_neo4j
+    hostname: logistics_neo4j
+    restart: unless-stopped
     environment:
       NEO4J_AUTH: neo4j/MyStrongPass123
+      JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
       # NEO4J_PLUGINS: '["apoc"]'   # disabled for simplicity
-    ports:
-      - "7474:7474"
-      - "7687:7687"
+    # Note: no host port mappings to avoid host conflicts; services access Neo4j via the Docker network
     volumes:
       - neo4j_data:/data
     healthcheck:
@@ -52,6 +55,7 @@ services:
   app:
     build: .
     container_name: logistics_app
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
