@@ -33,7 +33,8 @@ async function ingestLogFile() {
 
   for await (const line of rl) {
     lineCount++;
-    const trimmedLine = line.trim();
+    // Strip null characters (\0) which can occur when files are written in UTF-16 encoding
+    const trimmedLine = line.replace(/\0/g, '').trim();
     if (!trimmedLine) continue;
 
     try {

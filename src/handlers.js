@@ -96,12 +96,18 @@ async function queueForRetry(event) {
       }
     }
     
-    // Add the event
-    queue.push(event);
-    
-    // Write back atomically
-    fs.writeFileSync(RETRY_QUEUE_PATH, JSON.stringify(queue, null, 2), 'utf8');
-    console.log(`[RetryQueue] Deferred billing event for package ${event.payload.package_id} (Invoice: ${event.payload.invoice_id})`);
+    // Add the event if it doesn't already exist in the queue
+    const exists = queue.some(
+      item => item.payload && item.payload.invoice_id === event.payload.invoice_id
+    );
+    if (!exists) {
+      queue.push(event);
+      // Write back atomically
+      fs.writeFileSync(RETRY_QUEUE_PATH, JSON.stringify(queue, null, 2), 'utf8');
+      console.log(`[RetryQueue] Deferred billing event for package ${event.payload.package_id} (Invoice: ${event.payload.invoice_id})`);
+    } else {
+      console.log(`[RetryQueue] Billing event for invoice ${event.payload.invoice_id} is already in the queue. Skipping duplicate enqueue.`);
+    }
   } catch (err) {
     console.error('[RetryQueue] Failed to write event to retry queue:', err.message);
   }
