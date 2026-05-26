@@ -1,0 +1,9 @@
+{"timestamp": "2023-10-27T10:00:00Z", "type": "PACKAGE_STATUS_CHANGE", "payload": {"package_id": "pkg-abc-123", "status": "PICKED_UP", "location": {"lat": 34.0522, "lon": -118.2437}, "driver_id": "drv-xyz-789"}}
+{"timestamp": "2023-10-27T10:00:05Z", "type": "DRIVER_LOCATION_UPDATE", "payload": {"driver_id": "drv-xyz-789", "location": {"lat": 34.0530, "lon": -118.2445}, "zone_id": "zone-la-downtown"}}
+{"timestamp": "2023-10-27T10:10:00Z", "type": "PACKAGE_STATUS_CHANGE", "payload": {"package_id": "pkg-abc-123", "status": "DELIVERED", "location": {"lat": 34.0528, "lon": -118.2440}, "driver_id": "drv-xyz-789"}}
+{"timestamp": "2023-10-27T10:15:00Z", "type": "BILLING_EVENT", "payload": {"invoice_id": "inv-001", "package_id": "pkg-abc-123", "customer_id": "cust-456", "amount": 15.99}}
+{"invalid_json": true
+{"timestamp": "2023-10-27T11:00:00Z", "type": "BILLING_EVENT", "payload": {"invoice_id": "inv-002", "package_id": "pkg-xyz-789", "customer_id": "cust-999", "amount": 42.50}}
+{"package_id":"pkg-demo-001","status":"PICKED_UP","timestamp":"2026-05-28T18:43:37Z"}
+{"timestamp": "2026-05-28T10:00:00Z", "type": "PACKAGE_STATUS_CHANGE", "payload": {"package_id": "pkg-demo-001", "status": "PICKED_UP", "location": {"lat": 34.05, "lon": -118.25}, "driver_id": "drv-demo-999"}}
+{"timestamp": "2026-05-28T10:00:00Z", "type": "PACKAGE_STATUS_CHANGE", "payload": {"package_id": "pkg-demo-001", "status": "PICKED_UP", "location": {"lat": 34.05, "lon": -118.25}, "driver_id": "drv-demo-999"}}
